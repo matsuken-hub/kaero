@@ -224,6 +224,7 @@ const TIMETABLE = [
 ];
 
 let selectedTrain = null;
+let lastCardMinute = -1; // カードを最後に描画した分
 
 function timeToDate(hhmm) {
   const [h,m] = hhmm.split(":").map(Number);
@@ -319,7 +320,14 @@ function tick() {
   // 列車リスト更新（秒が0のときだけ、または初回）
   if (s===0 || !selectedTrain) updateTrains(now);
 
-  // カード更新
+  // カードは「分が変わったとき」だけ再描画（チカチカ防止）
+  if (m !== lastCardMinute) {
+    lastCardMinute = m;
+    renderCards(h, m);
+  }
+}
+
+function renderCards(h, m) {
   const sT = seatProb(crowdScore(h,m,"tsudanuma"));
   const sN = seatProb(crowdScore(h,m,"nishifuna"));
   const bestIs = sT>=sN ? "tsudanuma" : "nishifuna";
@@ -327,14 +335,14 @@ function tick() {
   renderCard("cardTsudanuma",{
     station:"tsudanuma", label:"津田沼 乗換",
     sub:"東西線 直通始発 · 座席確保しやすい",
-    arrMin:7, transferMin:5, tozaiMin:45,
+    arrMin:2, transferMin:5, tozaiMin:45,
     isBest: bestIs==="tsudanuma",
     seat:sT, train:selectedTrain
   });
   renderCard("cardNishifuna",{
     station:"nishifuna", label:"西船橋 乗換",
-    sub:"東西線 途中乗車 · 8分早く着く",
-    arrMin:3, transferMin:3, tozaiMin:43,
+    sub:"東西線 途中乗車 · 座れない可能性あり",
+    arrMin:11, transferMin:3, tozaiMin:43,
     isBest: bestIs==="nishifuna",
     seat:sN, train:selectedTrain
   });
@@ -362,6 +370,7 @@ function selectTrain(label) {
   const trains = getNextTrains(now, 4);
   selectedTrain = trains.find(t=>t.label===label) || trains[0];
   updateTrains(now);
+  lastCardMinute = -1; // 強制再描画
   tick();
 }
 
