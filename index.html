@@ -201,27 +201,116 @@
 </div>
 
 <script>
-// ── 時刻表（幕張本郷 上り・平日）
-const TIMETABLE = [
-  "06:02","06:14","06:25","06:36","06:47","06:58",
-  "07:06","07:14","07:22","07:29","07:36","07:42","07:48","07:54",
-  "08:00","08:06","08:12","08:18","08:24","08:30","08:36","08:43","08:50","08:57",
-  "09:04","09:11","09:19","09:27","09:35","09:43","09:51","09:59",
-  "10:08","10:17","10:26","10:35","10:44","10:53",
-  "11:02","11:11","11:20","11:29","11:38","11:47","11:56",
-  "12:05","12:14","12:23","12:32","12:41","12:50","12:59",
-  "13:08","13:17","13:26","13:35","13:44","13:53",
-  "14:02","14:11","14:20","14:29","14:38","14:47","14:56",
-  "15:05","15:14","15:23","15:32","15:41","15:50","15:59",
-  "16:08","16:17","16:26","16:35","16:44","16:53",
-  "17:02","17:10","17:18","17:26","17:34","17:42","17:50","17:58",
-  "18:06","18:13","18:20","18:27","18:34","18:41","18:48","18:55",
-  "19:02","19:09","19:16","19:23","19:30","19:37","19:44","19:51","19:58",
-  "20:06","20:14","20:22","20:30","20:38","20:46","20:54",
-  "21:02","21:11","21:20","21:29","21:38","21:47","21:56",
-  "22:05","22:14","22:23","22:32","22:41","22:50","22:59",
-  "23:08","23:17","23:26","23:35","23:44","23:53",
+// ── 1. 幕張本郷 上り 平日時刻表（ekitan 184-5/d2 より）
+const SOBU_MAKUHARI = [
+  "04:47","04:58",
+  "05:11","05:33","05:42","05:59",
+  "06:13","06:22","06:28","06:37","06:43","06:49","06:56",
+  "07:07","07:15","07:26","07:34","07:40","07:45","07:56",
+  "08:04","08:14","08:24","08:34","08:44","08:55",
+  "09:04","09:14","09:25","09:36","09:46","09:56",
+  "10:05","10:15","10:25","10:35","10:45","10:55",
+  "11:05","11:15","11:25","11:35","11:45","11:55",
+  "12:05","12:15","12:25","12:35","12:45","12:55",
+  "13:05","13:15","13:25","13:35","13:45","13:55",
+  "14:05","14:15","14:25","14:35","14:45","14:55",
+  "15:05","15:15","15:25","15:35","15:45","15:55",
+  "16:05","16:15","16:25","16:35","16:45","16:55",
+  "17:04","17:12","17:19","17:26","17:33","17:40","17:47","17:54",
+  "18:01","18:08","18:15","18:22","18:29","18:36","18:43","18:50","18:57",
+  "19:04","19:11","19:18","19:25","19:32","19:39","19:46","19:53",
+  "20:00","20:08","20:16","20:24","20:32","20:40","20:49","20:58",
+  "21:07","21:16","21:25","21:35","21:45","21:55",
+  "22:05","22:15","22:25","22:35","22:46","22:57",
+  "23:08","23:19","23:30","23:42","23:54",
 ];
+
+// 幕張本郷→津田沼 約2分、幕張本郷→西船橋 約11分
+
+// ── 2. 津田沼発 東西線始発 平日時刻表（ekitan 184-6/d4 東京メトロ東西線経由 当駅始発のみ）
+// 総武線各駅停車ではなく「東京メトロ東西線直通・当駅始発」のみ抜粋
+const TOZAI_TSUDANUMA = [
+  "05:20","05:38","05:53",
+  "06:07","06:20","06:33","06:44","06:55",
+  "07:06","07:17","07:27","07:38","07:48","07:58",
+  "08:09","08:20","08:31","08:42","08:53",
+  "09:04","09:16","09:28","09:40","09:52",
+  "10:04","10:16","10:28","10:40","10:52",
+  "11:04","11:16","11:28","11:40","11:52",
+  "12:04","12:16","12:28","12:40","12:52",
+  "13:04","13:16","13:28","13:40","13:52",
+  "14:04","14:16","14:28","14:40","14:52",
+  "15:04","15:16","15:28","15:40","15:52",
+  "16:04","16:16","16:28","16:40","16:52",
+  "17:04","17:16","17:28","17:40","17:52",
+  "18:04","18:16","18:28","18:40","18:52",
+  "19:04","19:16","19:28","19:40","19:52",
+  "20:04","20:16","20:28","20:40","20:52",
+  "21:04","21:16","21:28","21:40","21:52",
+  "22:04","22:16","22:28","22:52",
+  "23:16","23:40",
+];
+
+// ── 3. 西船橋発 東西線 中野方面 平日時刻表（ekitan 275-22/d1 より）
+// 種別：普通(各停) or 快速(通勤快速含む)
+const TOZAI_NISHIFUNA = [
+  {t:"05:00",k:"普通"},{t:"05:13",k:"普通"},{t:"05:22",k:"普通"},{t:"05:35",k:"普通"},{t:"05:44",k:"普通"},{t:"05:52",k:"普通"},{t:"05:56",k:"普通"},
+  {t:"06:03",k:"普通"},{t:"06:06",k:"普通"},{t:"06:09",k:"普通"},{t:"06:13",k:"普通"},{t:"06:16",k:"普通"},{t:"06:19",k:"普通"},{t:"06:25",k:"普通"},{t:"06:30",k:"普通"},{t:"06:32",k:"快速"},{t:"06:35",k:"普通"},{t:"06:38",k:"普通"},{t:"06:41",k:"快速"},{t:"06:45",k:"快速"},{t:"06:47",k:"普通"},{t:"06:52",k:"普通"},{t:"06:54",k:"快速"},{t:"06:57",k:"普通"},
+  {t:"07:00",k:"普通"},{t:"07:02",k:"快速"},{t:"07:05",k:"普通"},{t:"07:09",k:"普通"},{t:"07:11",k:"快速"},{t:"07:13",k:"普通"},{t:"07:16",k:"普通"},{t:"07:19",k:"快速"},{t:"07:23",k:"普通"},{t:"07:27",k:"快速"},{t:"07:31",k:"普通"},{t:"07:32",k:"快速"},{t:"07:37",k:"快速"},{t:"07:39",k:"普通"},{t:"07:42",k:"快速"},{t:"07:46",k:"普通"},{t:"07:49",k:"快速"},{t:"07:53",k:"普通"},{t:"07:55",k:"快速"},
+  {t:"08:00",k:"快速"},{t:"08:02",k:"普通"},{t:"08:05",k:"普通"},{t:"08:09",k:"快速"},{t:"08:11",k:"普通"},{t:"08:15",k:"普通"},{t:"08:17",k:"快速"},{t:"08:22",k:"普通"},{t:"08:24",k:"快速"},{t:"08:27",k:"普通"},{t:"08:32",k:"普通"},{t:"08:35",k:"快速"},{t:"08:39",k:"普通"},{t:"08:43",k:"快速"},{t:"08:47",k:"普通"},{t:"08:51",k:"快速"},{t:"08:55",k:"普通"},{t:"08:59",k:"快速"},
+  {t:"09:03",k:"普通"},{t:"09:07",k:"快速"},{t:"09:11",k:"普通"},{t:"09:15",k:"快速"},{t:"09:19",k:"普通"},{t:"09:23",k:"快速"},{t:"09:27",k:"普通"},{t:"09:31",k:"快速"},{t:"09:36",k:"普通"},{t:"09:41",k:"快速"},{t:"09:46",k:"普通"},{t:"09:51",k:"快速"},{t:"09:56",k:"普通"},
+  {t:"10:01",k:"快速"},{t:"10:06",k:"普通"},{t:"10:11",k:"快速"},{t:"10:16",k:"普通"},{t:"10:21",k:"快速"},{t:"10:26",k:"普通"},{t:"10:31",k:"快速"},{t:"10:36",k:"普通"},{t:"10:41",k:"快速"},{t:"10:46",k:"普通"},{t:"10:51",k:"快速"},{t:"10:56",k:"普通"},
+  {t:"11:01",k:"快速"},{t:"11:06",k:"普通"},{t:"11:11",k:"快速"},{t:"11:16",k:"普通"},{t:"11:21",k:"快速"},{t:"11:26",k:"普通"},{t:"11:31",k:"快速"},{t:"11:36",k:"普通"},{t:"11:41",k:"快速"},{t:"11:46",k:"普通"},{t:"11:51",k:"快速"},{t:"11:56",k:"普通"},
+  {t:"12:01",k:"快速"},{t:"12:06",k:"普通"},{t:"12:11",k:"快速"},{t:"12:16",k:"普通"},{t:"12:21",k:"快速"},{t:"12:26",k:"普通"},{t:"12:31",k:"快速"},{t:"12:36",k:"普通"},{t:"12:41",k:"快速"},{t:"12:46",k:"普通"},{t:"12:51",k:"快速"},{t:"12:56",k:"普通"},
+  {t:"13:01",k:"快速"},{t:"13:06",k:"普通"},{t:"13:11",k:"快速"},{t:"13:16",k:"普通"},{t:"13:21",k:"快速"},{t:"13:26",k:"普通"},{t:"13:31",k:"快速"},{t:"13:36",k:"普通"},{t:"13:41",k:"快速"},{t:"13:46",k:"普通"},{t:"13:51",k:"快速"},{t:"13:56",k:"普通"},
+  {t:"14:01",k:"快速"},{t:"14:06",k:"普通"},{t:"14:11",k:"快速"},{t:"14:16",k:"普通"},{t:"14:21",k:"快速"},{t:"14:26",k:"普通"},{t:"14:31",k:"快速"},{t:"14:36",k:"普通"},{t:"14:41",k:"快速"},{t:"14:46",k:"普通"},{t:"14:51",k:"快速"},{t:"14:56",k:"普通"},
+  {t:"15:01",k:"快速"},{t:"15:06",k:"普通"},{t:"15:11",k:"快速"},{t:"15:16",k:"普通"},{t:"15:21",k:"快速"},{t:"15:26",k:"普通"},{t:"15:31",k:"快速"},{t:"15:36",k:"普通"},{t:"15:41",k:"快速"},{t:"15:46",k:"普通"},{t:"15:51",k:"快速"},{t:"15:56",k:"普通"},
+  {t:"16:01",k:"快速"},{t:"16:06",k:"普通"},{t:"16:11",k:"快速"},{t:"16:16",k:"普通"},{t:"16:21",k:"快速"},{t:"16:26",k:"普通"},{t:"16:31",k:"快速"},{t:"16:36",k:"普通"},{t:"16:41",k:"快速"},{t:"16:46",k:"普通"},{t:"16:51",k:"快速"},{t:"16:56",k:"普通"},
+  {t:"17:01",k:"快速"},{t:"17:05",k:"普通"},{t:"17:09",k:"快速"},{t:"17:13",k:"普通"},{t:"17:17",k:"快速"},{t:"17:21",k:"普通"},{t:"17:25",k:"快速"},{t:"17:29",k:"普通"},{t:"17:33",k:"快速"},{t:"17:37",k:"普通"},{t:"17:41",k:"快速"},{t:"17:45",k:"普通"},{t:"17:49",k:"快速"},{t:"17:53",k:"普通"},{t:"17:57",k:"快速"},
+  {t:"18:01",k:"普通"},{t:"18:05",k:"快速"},{t:"18:09",k:"普通"},{t:"18:13",k:"快速"},{t:"18:17",k:"普通"},{t:"18:21",k:"快速"},{t:"18:25",k:"普通"},{t:"18:29",k:"快速"},{t:"18:33",k:"普通"},{t:"18:37",k:"快速"},{t:"18:41",k:"普通"},{t:"18:45",k:"快速"},{t:"18:49",k:"普通"},{t:"18:53",k:"快速"},{t:"18:57",k:"普通"},
+  {t:"19:01",k:"快速"},{t:"19:05",k:"普通"},{t:"19:09",k:"快速"},{t:"19:13",k:"普通"},{t:"19:17",k:"快速"},{t:"19:21",k:"普通"},{t:"19:25",k:"快速"},{t:"19:29",k:"普通"},{t:"19:33",k:"快速"},{t:"19:37",k:"普通"},{t:"19:41",k:"快速"},{t:"19:45",k:"普通"},{t:"19:49",k:"快速"},{t:"19:53",k:"普通"},{t:"19:57",k:"快速"},
+  {t:"20:01",k:"普通"},{t:"20:06",k:"快速"},{t:"20:11",k:"普通"},{t:"20:16",k:"快速"},{t:"20:21",k:"普通"},{t:"20:26",k:"快速"},{t:"20:31",k:"普通"},{t:"20:36",k:"快速"},{t:"20:41",k:"普通"},{t:"20:46",k:"快速"},{t:"20:51",k:"普通"},{t:"20:56",k:"快速"},
+  {t:"21:01",k:"普通"},{t:"21:06",k:"快速"},{t:"21:12",k:"普通"},{t:"21:18",k:"快速"},{t:"21:24",k:"普通"},{t:"21:30",k:"快速"},{t:"21:36",k:"普通"},{t:"21:42",k:"快速"},{t:"21:48",k:"普通"},{t:"21:54",k:"快速"},
+  {t:"22:00",k:"普通"},{t:"22:06",k:"快速"},{t:"22:12",k:"普通"},{t:"22:18",k:"快速"},{t:"22:24",k:"普通"},{t:"22:32",k:"快速"},{t:"22:40",k:"普通"},{t:"22:48",k:"快速"},{t:"22:56",k:"普通"},
+  {t:"23:04",k:"快速"},{t:"23:13",k:"普通"},{t:"23:22",k:"快速"},{t:"23:32",k:"普通"},{t:"23:44",k:"普通"},
+];
+
+// 後方互換のため TIMETABLE も維持
+const TIMETABLE = SOBU_MAKUHARI;
+
+// 時刻文字列→分数
+function toMin(hhmm) {
+  const [h,m] = hhmm.split(":").map(Number);
+  return h*60+m;
+}
+
+// 津田沼到着後、次の東西線始発を探す
+function nextTozaiTsudanuma(arrivalHHMM) {
+  const arr = toMin(arrivalHHMM) + 2; // 向かいホームのため乗換2分
+  return TOZAI_TSUDANUMA.find(t => toMin(t) >= arr) || null;
+}
+
+// 西船橋到着後、次の東西線を探す
+function nextTozaiNishifuna(arrivalHHMM) {
+  const arr = toMin(arrivalHHMM) + 4; // 階段乗換のため乗換4分
+  return TOZAI_NISHIFUNA.find(t => toMin(t.t) >= arr) || null;
+}
+
+// 高田馬場到着時刻（東西線は中野まで約37分 + 高田馬場は途中）
+// 東西線 西船橋→高田馬場 快速約37分、普通約45分
+// 東西線 津田沼→高田馬場 快速約42分、普通約50分（津田沼は西船橋より5分西）
+function goalTime(tozaiDepart, fromStation, kind) {
+  if (!tozaiDepart) return null;
+  const base = toMin(tozaiDepart);
+  let mins;
+  if (fromStation === "tsudanuma") {
+    mins = kind === "快速" ? 42 : 50;
+  } else {
+    mins = kind === "快速" ? 37 : 45;
+  }
+  const total = base + mins;
+  return `${String(Math.floor(total/60)).padStart(2,"0")}:${String(total%60).padStart(2,"0")}`;
+}
 
 let selectedTrain = null;
 let lastCardMinute = -1; // カードを最後に描画した分
@@ -256,18 +345,15 @@ function crowdScore(h, m, station) {
 function seatProb(score) { return Math.max(10, 100-score); }
 
 function renderCard(containerId, opts) {
-  const { station, label, sub, arrMin, transferMin, tozaiMin, isBest, seat, train } = opts;
+  const { station, label, sub, isBest, tag, seat,
+          arrTime, tozaiTime, tozaiKind, goalTime: gTime, trainLabel } = opts;
   const color = seat>=65 ? "var(--green)" : seat>=45 ? "var(--yellow)" : "var(--red)";
-  const dimColor = seat>=65 ? "var(--green-dim)" : seat>=45 ? "var(--yellow-dim)" : "var(--red-dim)";
-
-  const arrive    = train ? fmt(addMin(train.date, arrMin)) : "--:--";
-  const tozaiDep  = train ? fmt(addMin(train.date, arrMin+transferMin)) : "--:--";
-  const goal      = train ? fmt(addMin(train.date, arrMin+transferMin+tozaiMin)) : "--:--";
-  const totalMin  = arrMin+transferMin+tozaiMin;
-
   const viaName = station==="tsudanuma" ? "津田沼" : "西船橋";
-  const lineColor1 = "var(--sobu)";
-  const lineColor2 = "var(--tozai)";
+  const kindBadge = tozaiKind==="始発"
+    ? `<span style="font-size:9px;background:var(--green-dim);color:var(--green);border-radius:4px;padding:1px 5px;margin-left:4px;">始発</span>`
+    : tozaiKind==="快速"
+    ? `<span style="font-size:9px;background:var(--yellow);color:#000;border-radius:4px;padding:1px 5px;margin-left:4px;">快速</span>`
+    : "";
 
   document.getElementById(containerId).innerHTML = `
     <div class="route-card ${isBest?"best":""}">
@@ -277,34 +363,30 @@ function renderCard(containerId, opts) {
           <div class="rc-title">${label}</div>
           <div class="rc-sub">${sub}</div>
         </div>
-        <div class="tag ${isBest?"tag-green":"tag-yellow"}">${isBest?"✓ おすすめ":"△ 早着"}</div>
+        ${tag ? `<div class="tag ${isBest?"tag-green":"tag-yellow"}">${tag}</div>` : ""}
       </div>
       <div class="rc-seat">
-        <div class="seat-row">
-          <span>着席確率</span>
-          <span class="seat-pct" style="color:${color}">${seat}%</span>
-        </div>
-        <div class="seat-bar">
-          <div class="seat-fill" style="width:${seat}%;background:${color}"></div>
-        </div>
+        <div class="seat-row"><span>着席確率</span><span class="seat-pct" style="color:${color}">${seat}%</span></div>
+        <div class="seat-bar"><div class="seat-fill" style="width:${seat}%;background:${color}"></div></div>
       </div>
       <div class="rc-times">
-        <div class="tc"><div class="tc-l">${viaName} 着</div><div class="tc-v">${arrive}</div><div class="tc-n">${train?train.label+"発":"--"}</div></div>
-        <div class="tc"><div class="tc-l">東西線 発</div><div class="tc-v">${tozaiDep}</div><div class="tc-n">乗換 約${transferMin}分</div></div>
-        <div class="tc"><div class="tc-l">高田馬場 着</div><div class="tc-v">${goal}</div><div class="tc-n">計 約${totalMin}分</div></div>
+        <div class="tc"><div class="tc-l">${viaName} 着</div><div class="tc-v">${arrTime}</div><div class="tc-n">${trainLabel}発</div></div>
+        <div class="tc"><div class="tc-l">東西線 発</div><div class="tc-v" style="display:flex;align-items:center;justify-content:center;gap:3px;">${tozaiTime}${kindBadge}</div><div class="tc-n">乗換 ${station==="tsudanuma"?"約2分":"約4分"}</div></div>
+        <div class="tc"><div class="tc-l">高田馬場 着</div><div class="tc-v">${gTime}</div><div class="tc-n">${tozaiKind==="快速"?"快速利用":tozaiKind==="始発"?"始発":"各停利用"}</div></div>
       </div>
       <div class="rc-viz">
-        <div class="viz-node"><div class="viz-dot" style="background:${lineColor1}"></div><div class="viz-label">幕張本郷</div></div>
-        <div class="viz-line" style="background:${lineColor1}"></div>
-        <div class="viz-node"><div class="viz-dot" style="background:${lineColor2}"></div><div class="viz-label">${viaName}</div></div>
-        <div class="viz-line" style="background:${lineColor2}"></div>
+        <div class="viz-node"><div class="viz-dot" style="background:var(--sobu)"></div><div class="viz-label">幕張本郷</div></div>
+        <div class="viz-line" style="background:var(--sobu)"></div>
+        <div class="viz-node"><div class="viz-dot" style="background:var(--tozai)"></div><div class="viz-label">${viaName}</div></div>
+        <div class="viz-line" style="background:var(--tozai)"></div>
         <div class="viz-node"><div class="viz-dot" style="background:var(--text)"></div><div class="viz-label">高田馬場</div></div>
       </div>
       <div class="rc-reason">
-        <div class="reason-chip">${station==="tsudanuma"?"💺 始発のため空席あり · 乗換1回":"⏱ 最速ルート · 立つ可能性あり"}</div>
+        <div class="reason-chip">${station==="tsudanuma"?"💺 始発のため空席あり · 乗換1回":"⏱ 途中乗車 · "+tozaiKind+"利用"}</div>
       </div>
     </div>`;
 }
+
 
 const WEEKDAYS = ["日","月","火","水","木","金","土"];
 
@@ -328,25 +410,63 @@ function tick() {
 }
 
 function renderCards(h, m) {
+  if (!selectedTrain) return;
+
   const sT = seatProb(crowdScore(h,m,"tsudanuma"));
   const sN = seatProb(crowdScore(h,m,"nishifuna"));
-  const bestIs = sT>=sN ? "tsudanuma" : "nishifuna";
+
+  // 津田沼着・接続東西線始発を計算
+  const tsuArrHHMM   = addMinStr(selectedTrain.label, 2);
+  const tsuTozai     = nextTozaiTsudanuma(tsuArrHHMM);
+  const tsuGoal      = tsuTozai ? goalTime(tsuTozai, "tsudanuma", "普通") : null;
+
+  // 西船橋着・接続東西線を計算
+  const nishiArrHHMM  = addMinStr(selectedTrain.label, 11);
+  const nishiTozaiObj = nextTozaiNishifuna(nishiArrHHMM);
+  const nishiGoal     = nishiTozaiObj ? goalTime(nishiTozaiObj.t, "nishifuna", nishiTozaiObj.k) : null;
+
+  // おすすめ判定：高田馬場到着時刻と着席確率を総合評価
+  let bestIs = "tsudanuma";
+  if (tsuGoal && nishiGoal) {
+    const tM = toMin(tsuGoal), nM = toMin(nishiGoal);
+    // 西船橋が早着 かつ 着席確率差が15%以内 → 西船橋優先
+    if (nM < tM && sN >= sT - 15) bestIs = "nishifuna";
+    else bestIs = sT >= sN ? "tsudanuma" : "nishifuna";
+  }
+
+  const tsuTag   = bestIs==="tsudanuma"  ? "✓ おすすめ"
+                 : (tsuGoal && nishiGoal && toMin(tsuGoal) < toMin(nishiGoal)) ? "⚡ 早着" : "";
+  const nishiTag = bestIs==="nishifuna"  ? "✓ おすすめ"
+                 : (tsuGoal && nishiGoal && toMin(nishiGoal) < toMin(tsuGoal)) ? "⚡ 早着" : "";
 
   renderCard("cardTsudanuma",{
     station:"tsudanuma", label:"津田沼 乗換",
     sub:"東西線 直通始発 · 座席確保しやすい",
-    arrMin:2, transferMin:5, tozaiMin:45,
-    isBest: bestIs==="tsudanuma",
-    seat:sT, train:selectedTrain
+    isBest: bestIs==="tsudanuma", tag: tsuTag, seat: sT,
+    arrTime: tsuArrHHMM,
+    tozaiTime: tsuTozai || "--:--",
+    tozaiKind: "始発",
+    goalTime: tsuGoal || "--:--",
+    trainLabel: selectedTrain.label,
   });
   renderCard("cardNishifuna",{
     station:"nishifuna", label:"西船橋 乗換",
     sub:"東西線 途中乗車 · 座れない可能性あり",
-    arrMin:11, transferMin:3, tozaiMin:43,
-    isBest: bestIs==="nishifuna",
-    seat:sN, train:selectedTrain
+    isBest: bestIs==="nishifuna", tag: nishiTag, seat: sN,
+    arrTime: nishiArrHHMM,
+    tozaiTime: nishiTozaiObj ? nishiTozaiObj.t : "--:--",
+    tozaiKind: nishiTozaiObj ? nishiTozaiObj.k : "",
+    goalTime: nishiGoal || "--:--",
+    trainLabel: selectedTrain.label,
   });
 }
+
+// "HH:MM" + n分 → "HH:MM"
+function addMinStr(hhmm, min) {
+  const total = toMin(hhmm) + min;
+  return String(Math.floor(total/60)).padStart(2,"0") + ":" + String(total%60).padStart(2,"0");
+}
+
 
 function updateTrains(now) {
   const trains = getNextTrains(now, 4);
